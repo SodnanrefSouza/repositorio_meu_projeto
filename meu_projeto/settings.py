@@ -1,4 +1,6 @@
 from pathlib import Path
+import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'gerenciador_tabelas',
     'autenticacao',
+    'bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -44,7 +47,7 @@ ROOT_URLCONF = 'meu_projeto.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # Adicione o caminho correto para a pasta templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -56,6 +59,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'meu_projeto.wsgi.application'
 
