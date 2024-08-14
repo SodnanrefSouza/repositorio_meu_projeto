@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Listar Tabelas</title>
+</head>
+<body>
+    <h1>Tabelas e Colunas</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nome da Tabela</th>
+                <th>Colunas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for table, columns in table_columns.items %}
+            <tr>
+                <td>{{ table }}</td>
+                <td>
+                    {{ columns|join:", " }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <br>
+    <a href="{% url 'criar_tabela' %}">Criar Tabela</a>
+</body>
+</html>

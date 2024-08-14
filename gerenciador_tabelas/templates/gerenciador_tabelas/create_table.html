@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Table</title>
+</head>
+<body>
+    <h1>Create a New Table</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="table_name">Table Name:</label>
+        <input type="text" id="table_name" name="table_name"><br><br>
+
+        <label for="column_definitions">Column Definitions:</label>
+        <input type="text" id="column_definitions" name="column_definitions"><br><br>
+
+        <input type="submit" value="Create Table">
+    </form>
+
+    <br>
+    <a href="{% url 'listar_tabelas' %}">Listar Tabelas</a>
+</body>
+</html>
