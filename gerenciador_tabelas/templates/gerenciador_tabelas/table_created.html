@@ -3,14 +3,14 @@
 {% block title %}Tabela Criada{% endblock %}
 
 {% block content %}
-<div class="container my-4 text-center">
-    <h1 class="mb-4">Tabela Criada com Sucesso!</h1>
-    <p class="lead">A tabela foi criada com o nome: <strong>{{ table_name }}</strong>.</p>
+<div class="max-w-4xl mx-auto my-4 text-center p-6 bg-white rounded-lg shadow-md">
+    <h1 class="text-3xl font-bold mb-4">Tabela Criada com Sucesso!</h1>
+    <p class="text-lg">A tabela foi criada com o nome: <strong>{{ table_name }}</strong>.</p>
     <p>Você pode criar mais tabelas ou voltar para a página principal.</p>
 
-    <div class="d-flex justify-content-center">
-        <a href="{% url 'criar_tabela' %}" class="btn btn-success me-2">Criar Outra Tabela</a>
-        <a href="{% url 'listar_tabelas' %}" class="btn btn-secondary">Listar Tabelas</a>
+    <div class="flex justify-center mt-4">
+        <a href="{% url 'criar_tabela' %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md mr-2">Criar Outra Tabela</a>
+        <a href="{% url 'listar_tabelas' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md">Listar Tabelas</a>
     </div>
 </div>
 {% endblock %}

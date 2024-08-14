@@ -12,12 +12,12 @@ urlpatterns = [
     path('', RedirectView.as_view(url='autenticacao/home/', permanent=False), name='root'),
 
     # Rotas de autenticação
-    path('autenticacao/', include([
+    path('autenticacao/', include(([
         path('', auth_views.LoginView.as_view(template_name='autenticacao/login.html', redirect_authenticated_user=True), name='login'),
         path('signup/', signup_view, name='signup'),
         path('home/', home_view, name='home'),
-        path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    ])),
+        path('logout/', auth_views.LogoutView.as_view(next_page='autenticacao:login'), name='logout'),
+    ], 'autenticacao'), namespace='autenticacao')),
 
     # Rotas do gerenciador de tabelas
     path('gerenciador_tabelas/', include('gerenciador_tabelas.urls')),
