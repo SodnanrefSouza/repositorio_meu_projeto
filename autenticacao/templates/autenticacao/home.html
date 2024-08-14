@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Página Principal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Bem-vindo ao Painel Principal</h2>
+    <p class="text-center">Aqui você pode acessar as diferentes funcionalidades do seu projeto.</p>
+    
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'criar_tabela' %}" class="btn btn-primary me-2">Criar Tabela</a>
+        <a href="{% url 'listar_tabelas' %}" class="btn btn-secondary">Listar Tabelas</a>
+    </div>
+</div>
+{% endblock %}
