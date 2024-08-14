@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Registros da Tabela {{ table_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto my-6 p-8 bg-white rounded-lg shadow-md">
+    <h1 class="text-4xl font-bold mb-6">Registros da Tabela {{ table_name }}</h1>
+
+    {% if error %}
+        <p class="text-red-500">{{ error }}</p>
+    {% else %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-300">
+                <thead class="bg-gray-900 text-white">
+                    <tr>
+                        {% for column in column_names %}
+                        <th class="py-3 px-4 border-b text-left text-sm font-medium tracking-wider">{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in page_obj %}
+                    <tr class="hover:bg-gray-100">
+                        {% for cell in row %}
+                        <td class="py-2 px-4 border-b text-sm text-gray-700 whitespace-nowrap overflow-hidden overflow-ellipsis max-w-xs cursor-pointer" 
+                            title="{{ cell }}" 
+                            onclick="copyToClipboard(this)">
+                            {{ cell }}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        <div class="mt-6 flex justify-between items-center">
+            <span class="text-sm text-gray-600">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+            <div class="inline-flex">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l">Anterior</a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="bg-blue-500 text-white font-bold py-2 px-4 rounded-md mx-1">{{ num }}</span>
+                    {% else %}
+                        <a href="?page={{ num }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md mx-1">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r">Próxima</a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Mensagem de Copiado -->
+<div id="copy-message" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-md shadow-md opacity-0 transition-opacity duration-500">
+    Copiado!
+</div>
+
+<script>
+function copyToClipboard(element) {
+    // Cria um elemento temporário para copiar o texto
+    var tempInput = document.createElement("input");
+    tempInput.value = element.textContent.trim();
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    
+    // Mostra a mensagem de copiado
+    var copyMessage = document.getElementById("copy-message");
+    copyMessage.style.opacity = 1;
+    
+    // Oculta a mensagem após 2 segundos
+    setTimeout(function() {
+        copyMessage.style.opacity = 0;
+    }, 2000);
+}
+</script>
+{% endblock %}

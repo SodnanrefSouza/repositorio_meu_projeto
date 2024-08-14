@@ -3,33 +3,88 @@
 {% block title %}Listar Tabelas{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto my-4 p-6 bg-white rounded-lg shadow-md">
-    <h1 class="text-3xl font-bold mb-4">Tabelas e Colunas</h1>
+<div class="max-w-6xl mx-auto my-6 p-8 bg-white rounded-lg shadow-md">
+    <h1 class="text-4xl font-bold mb-6">Tabelas e Colunas</h1>
     
-    <!-- Tabela estilizada com Tailwind -->
     <div class="overflow-x-auto">
-        <table class="min-w-full border border-gray-300">
-            <thead class="bg-gray-800 text-white">
+        <table class="min-w-full border border-gray-300 divide-y divide-gray-200">
+            <thead class="bg-gray-900 text-white">
                 <tr>
-                    <th class="py-2 px-4 border-b">Nome da Tabela</th>
-                    <th class="py-2 px-4 border-b">Colunas</th>
+                    <th class="py-3 px-6 text-left text-sm font-medium tracking-wider">Nome da Tabela</th>
+                    <th class="py-3 px-6 text-left text-sm font-medium tracking-wider">Colunas</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for table, columns in table_columns.items %}
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for table, columns in page_obj %}
                 <tr class="hover:bg-gray-100">
-                    <td class="py-2 px-4 border-b">{{ table }}</td>
-                    <td class="py-2 px-4 border-b">{{ columns|join:", " }}</td>
+                    <td class="py-4 px-6 text-sm font-medium text-gray-900">
+                        <a href="{% url 'listar_registros' table %}" class="text-blue-500 hover:underline">{{ table }}</a>
+                    </td>
+                    <td class="py-4 px-6 text-sm text-gray-700">
+                        {% for column in columns %}
+                        <span class="block truncate cursor-pointer" onclick="copyToClipboard(this)" title="{{ column.column_name }}">{{ forloop.counter }}. {{ column.column_name }} ({{ column.type }}) - {{ column.description }}</span>
+                        {% endfor %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <!-- Botões estilizados com Tailwind -->
-    <div class="mt-3">
+    <!-- Paginação -->
+    <div class="mt-6 flex justify-between items-center">
+        <span class="text-sm text-gray-600">
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </span>
+        <div class="inline-flex">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l">Anterior</a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="bg-blue-500 text-white font-bold py-2 px-4 rounded-md mx-1">{{ num }}</span>
+                {% else %}
+                    <a href="?page={{ num }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md mx-1">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r">Próxima</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-6 flex justify-start space-x-4">
         <a href="{% url 'criar_tabela' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md">Criar Tabela</a>
-        <a href="{% url 'listar_tabelas' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md ml-2">Listar Tabelas</a>
+        <a href="{% url 'listar_tabelas' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md">Listar Tabelas</a>
     </div>
 </div>
+
+<!-- Mensagem de Copiado -->
+<div id="copy-message" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-md shadow-md opacity-0 transition-opacity duration-500">
+    Copiado!
+</div>
+
+<script>
+function copyToClipboard(element) {
+    // Cria um elemento temporário para copiar o texto
+    var textToCopy = element.title; // Copia somente o nome da coluna
+    var tempInput = document.createElement("input");
+    tempInput.value = textToCopy;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    
+    // Mostra a mensagem de copiado
+    var copyMessage = document.getElementById("copy-message");
+    copyMessage.style.opacity = 1;
+    
+    // Oculta a mensagem após 2 segundos
+    setTimeout(function() {
+        copyMessage.style.opacity = 0;
+    }, 2000);
+}
+</script>
 {% endblock %}

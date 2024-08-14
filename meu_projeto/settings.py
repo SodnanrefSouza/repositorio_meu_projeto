@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'gerenciador_tabelas',
     'autenticacao',
-    'bootstrap5',
+    'api_integration',
 ]
 
 MIDDLEWARE = [
