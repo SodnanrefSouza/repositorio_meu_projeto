@@ -6,7 +6,7 @@
 <div class="max-w-4xl mx-auto my-4 p-6 bg-white rounded-lg shadow-md">
     <h1 class="text-3xl font-bold mb-4">Criar uma Nova Tabela</h1>
     
-    <form method="post">
+    <form method="post" onsubmit="return buildColumnDefinitions()">
         {% csrf_token %}
         <div class="flex items-center">
             <label for="table_name" class="block text-gray-700 font-semibold mr-3 w-3/24">Nome da Tabela:</label>
@@ -37,6 +37,9 @@
             </div>
         </div>
 
+        <input type="hidden" id="id_column_definitions" name="column_definitions">
+        <input type="hidden" id="id_comment_statements" name="comment_statements">
+
         <button type="button" id="add-column" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md mt-4" onclick="addColumn()">Adicionar Coluna</button>
         
         <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md mt-4">Criar Tabela</button>
@@ -64,12 +67,11 @@
                     <option value="DATE">DATE</option>
                     <option value="BOOLEAN">BOOLEAN</option>
                 </select>
-
                 <input type="text" name="varchar_length" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 hidden w-5/24" placeholder="Tamanho VARCHAR" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
             </div>
             <div class="flex items-center mt-2">
-                <label class="ml-2">
-                    <input type="checkbox" name="nullable" class="mr-1"> Nullable
+                <label class="mr-2 w-3/24">
+                    <input type="checkbox" name="nullable"> Pode ser Nulo
                 </label>
                 <input type="text" name="column_descriptions" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 w-1/3" placeholder="Descrição da coluna">
                 <button type="button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md ml-2" onclick="removeColumn(this)">Remover</button>
@@ -98,5 +100,51 @@
             varcharInput.value = '';
         }
     }
+
+    function buildColumnDefinitions() {
+        const columns = document.getElementsByName('column_names');
+        const types = document.getElementsByName('column_types');
+        const nullable = document.getElementsByName('nullable');
+        const descriptions = document.getElementsByName('column_descriptions');
+        const varcharLengths = document.getElementsByName('varchar_length');
+        
+        let columnDefinitions = [];
+        let commentStatements = [];
+        
+        const tableName = document.getElementById('table_name').value; // Nome da tabela
+        
+        for (let i = 0; i < columns.length; i++) {
+            let columnDefinition = `${columns[i].value} ${types[i].value}`;
+            
+            // Adiciona o tamanho do VARCHAR se for especificado
+            if (types[i].value === 'VARCHAR' && varcharLengths[i].value) {
+                columnDefinition += `(${varcharLengths[i].value})`;
+            }
+            
+            // Adiciona NOT NULL se não puder ser nulo
+            if (!nullable[i].checked) {
+                columnDefinition += ' NOT NULL';
+            }
+            
+            columnDefinitions.push(columnDefinition);
+            
+            // Se houver uma descrição, crie um comando COMMENT ON separado
+            if (descriptions[i].value) {
+                commentStatements.push(`COMMENT ON COLUMN ${tableName}.${columns[i].value} IS '${descriptions[i].value}';`);
+            }
+        }
+    
+        console.log('Definições de Colunas:', columnDefinitions.join(', '));
+        console.log('Comandos de Comentário:', commentStatements.join(' '));
+        
+        // Junta as definições de colunas com vírgulas
+        document.getElementById('id_column_definitions').value = columnDefinitions.join(', ');
+        // Junta as declarações de comentário com espaços
+        document.getElementById('id_comment_statements').value = commentStatements.join(' ');
+        
+        return true; // Permite que o formulário seja enviado
+    }
+    
+
 </script>
 {% endblock %}

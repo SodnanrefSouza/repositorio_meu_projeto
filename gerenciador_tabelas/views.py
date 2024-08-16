@@ -1,21 +1,37 @@
-from django.shortcuts import render
 from django.db import connection
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
 
-@login_required
+
 def create_table(request):
     if request.method == 'POST':
         table_name = request.POST.get('table_name')
         column_definitions = request.POST.get('column_definitions')
+        comment_statements = request.POST.get('comment_statements')
+
+        try:
+            with connection.cursor() as cursor:
+                # Cria a tabela sem os comentários
+                print(f"QUERY CRIADA: CREATE TABLE {table_name} ({column_definitions});")
+                cursor.execute(f"CREATE TABLE {table_name} ({column_definitions});")
+                
+                # Executa os comentários separadamente
+                if comment_statements:
+                    for comment in comment_statements.split(';'):
+                        if comment.strip():
+                            print(f"QUERY CRIADA: {comment}")
+                            cursor.execute(comment)
+        except Exception as e:
+            print(f"Erro ao criar a tabela: {e}")
+            return HttpResponse(f"Erro: {e}")
         
-        with connection.cursor() as cursor:
-            cursor.execute(f"CREATE TABLE {table_name} ({column_definitions});")
-        
-        # Renderiza a página de confirmação com o nome da tabela
         return render(request, 'gerenciador_tabelas/table_created.html', {'table_name': table_name})
-    
+
     return render(request, 'gerenciador_tabelas/create_table.html')
+
+
 
 @login_required
 def list_tables(request):
