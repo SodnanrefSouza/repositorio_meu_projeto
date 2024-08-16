@@ -58,6 +58,11 @@
             </div>
         </div>
     {% endif %}
+
+    <div class="mt-6 flex justify-start space-x-4">
+        <a href="{% url 'criar_tabela' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md">Criar Tabela</a>
+        <a href="{% url 'listar_tabelas' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md">Listar Tabelas</a>
+    </div>
 </div>
 
 <!-- Mensagem de Copiado -->

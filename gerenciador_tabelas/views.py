@@ -11,21 +11,31 @@ def create_table(request):
         column_definitions = request.POST.get('column_definitions')
         comment_statements = request.POST.get('comment_statements')
 
+        error_message = None  # Variável para armazenar a mensagem de erro
+        
         try:
             with connection.cursor() as cursor:
                 # Cria a tabela sem os comentários
-                print(f"QUERY CRIADA: CREATE TABLE {table_name} ({column_definitions});")
+                print(f"CREATE TABLE {table_name} ({column_definitions});")
                 cursor.execute(f"CREATE TABLE {table_name} ({column_definitions});")
                 
                 # Executa os comentários separadamente
                 if comment_statements:
                     for comment in comment_statements.split(';'):
                         if comment.strip():
-                            print(f"QUERY CRIADA: {comment}")
                             cursor.execute(comment)
         except Exception as e:
-            print(f"Erro ao criar a tabela: {e}")
-            return HttpResponse(f"Erro: {e}")
+            # Formata a mensagem de erro
+            error_message = f"Erro ao criar a tabela: {str(e)}"
+        
+        if error_message:
+            # Renderiza o template de erro com a mensagem formatada
+            return render(request, 'gerenciador_tabelas/create_table.html', {
+                'error_message': error_message,
+                'table_name': table_name,
+                'column_definitions': column_definitions,
+                'comment_statements': comment_statements
+            })
         
         return render(request, 'gerenciador_tabelas/table_created.html', {'table_name': table_name})
 

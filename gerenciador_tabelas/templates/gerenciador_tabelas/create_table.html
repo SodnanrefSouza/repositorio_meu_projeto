@@ -3,35 +3,57 @@
 {% block title %}Criar Tabela{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto my-4 p-6 bg-white rounded-lg shadow-md">
+<div class="max-w-full mx-auto my-4 p-6 bg-white rounded-lg shadow-md">
     <h1 class="text-3xl font-bold mb-4">Criar uma Nova Tabela</h1>
     
     <form method="post" onsubmit="return buildColumnDefinitions()">
         {% csrf_token %}
-        <div class="flex items-center">
+        <div class="flex items-center mb-2">
             <label for="table_name" class="block text-gray-700 font-semibold mr-3 w-3/24">Nome da Tabela:</label>
-            <input type="text" id="table_name" name="table_name" class="border border-gray-300 rounded-lg py-2 px-4 w-2/6" placeholder="Digite o nome da tabela" required>
+            <input type="text" id="table_name" name="table_name" class="border border-gray-300 rounded-lg py-2 px-4 w-1/8" placeholder="Digite o nome da tabela" required="">
         </div>
+    
+        {% if error_message %}
+        <div class="text-red-500 mb-4">
+            {{ error_message }}
+        </div>
+        {% endif %}
 
         <div id="columns-container" class="grid grid-cols-1">
             <div class="flex flex-col mb-2">
-                <div class="flex items-center mt-2">
+                <div class="flex items-center">
                     <label for="column_name_0" class="block text-gray-700 font-semibold mr-2 w-3/24">Nome da Coluna:</label>
-                    <input type="text" id="column_name_0" name="column_names" class="border border-gray-300 rounded-lg py-2 px-4 w-2/6" placeholder="Digite o nome da coluna" required>
-                    <select name="column_types" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 w-1/6" onchange="toggleVarcharField(this)">
+                    <input type="text" id="column_name_0" name="column_names" class="border border-gray-300 rounded-lg py-2 px-4 w-1/8" placeholder="Digite o nome da coluna" required="">
+                    <select name="column_types" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 w-1/8" onchange="toggleFieldVisibility(this)">
                         <option value="INT">INT</option>
                         <option value="VARCHAR">VARCHAR</option>
                         <option value="TEXT">TEXT</option>
                         <option value="DATE">DATE</option>
                         <option value="BOOLEAN">BOOLEAN</option>
+                        <option value="SERIAL">SERIAL</option>
+                        <option value="BIGINT">BIGINT</option>
+                        <option value="SMALLINT">SMALLINT</option>
+                        <option value="NUMERIC">NUMERIC</option>
+                        <option value="REAL">REAL</option>
+                        <option value="DOUBLE PRECISION">DOUBLE PRECISION</option>
+                        <option value="TIMESTAMP">TIMESTAMP</option>
+                        <option value="TIME">TIME</option>
+                        <option value="JSON">JSON</option>
+                        <option value="UUID">UUID</option>
+                        <option value="CHAR">CHAR</option>
+                        <option value="BIT">BIT</option>
+                        <option value="BIT VARYING">BIT VARYING</option>
+                        <option value="ARRAY">ARRAY</option>
                     </select>
-                    <input type="text" name="varchar_length" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 hidden w-5/24" placeholder="Tamanho VARCHAR" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                    <input type="text" name="varchar_length" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 hidden w-1/8" placeholder="Tamanho VARCHAR" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                    <input type="text" name="numeric_precision" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 hidden w-1/8" placeholder="Precisão" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                    <input type="text" name="numeric_scale" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 hidden w-1/8" placeholder="Escala" oninput="this.value = this.value.replace(/[^0-9]/g, '');">                    
                 </div>
                 <div class="flex items-center mt-2">
                     <label class="mr-2 w-3/24">
                         <input type="checkbox" name="nullable"> Pode ser Nulo
                     </label>
-                    <input type="text" name="column_descriptions" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 w-1/3" placeholder="Descrição da coluna">
+                    <input type="text" name="column_descriptions" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 w-1/8" placeholder="Descrição da coluna">
                     <button type="button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md ml-2" onclick="removeColumn(this)">Remover</button>
                 </div>
             </div>
@@ -40,66 +62,98 @@
         <input type="hidden" id="id_column_definitions" name="column_definitions">
         <input type="hidden" id="id_comment_statements" name="comment_statements">
 
-        <button type="button" id="add-column" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md mt-4" onclick="addColumn()">Adicionar Coluna</button>
-        
-        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md mt-4">Criar Tabela</button>
+        <button type="button" id="add-column" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md mt-4 inline-block" onclick="addColumn()">Adicionar Coluna</button>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md mt-4 inline-block">Criar Tabela</button>
+        <a href="/gerenciador_tabelas/listar-tabelas/" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md mt-4 inline-block">Listar Tabelas</a>
+
     </form>
 
     <br>
-    <a href="{% url 'listar_tabelas' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md">Listar Tabelas</a>
 </div>
 
 <script>
     function addColumn() {
         const container = document.getElementById('columns-container');
         const index = container.children.length;
-
+    
         const columnDiv = document.createElement('div');
         columnDiv.className = 'flex flex-col mb-2';
         columnDiv.innerHTML = `
             <div class="flex items-center">
-                <label for="column_name_${index}" class="block text-gray-700 font-semibold mr-2 w-3/24">Nome da Coluna:</label>
-                <input type="text" id="column_name_${index}" name="column_names" class="border border-gray-300 rounded-lg py-2 px-4 w-2/6" placeholder="Digite o nome da coluna" required>
-                <select name="column_types" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 w-1/6" onchange="toggleVarcharField(this)">
+                <label for="column_name_${index}" class="block text-gray-700 font-semibold mr-2 w-1/16">Nome da Coluna:</label>
+                <input type="text" id="column_name_${index}" name="column_names" class="border border-gray-300 rounded-lg py-2 px-4 w-1/16" placeholder="Digite o nome da coluna" required>
+                <select name="column_types" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 w-1/8" onchange="toggleFieldVisibility(this)">
                     <option value="INT">INT</option>
                     <option value="VARCHAR">VARCHAR</option>
                     <option value="TEXT">TEXT</option>
                     <option value="DATE">DATE</option>
                     <option value="BOOLEAN">BOOLEAN</option>
+                    <option value="SERIAL">SERIAL</option>
+                    <option value="BIGINT">BIGINT</option>
+                    <option value="SMALLINT">SMALLINT</option>
+                    <option value="NUMERIC">NUMERIC</option>
+                    <option value="REAL">REAL</option>
+                    <option value="DOUBLE PRECISION">DOUBLE PRECISION</option>
+                    <option value="TIMESTAMP">TIMESTAMP</option>
+                    <option value="TIME">TIME</option>
+                    <option value="JSON">JSON</option>
+                    <option value="UUID">UUID</option>
+                    <option value="CHAR">CHAR</option>
+                    <option value="BIT">BIT</option>
+                    <option value="BIT VARYING">BIT VARYING</option>
+                    <option value="ARRAY">ARRAY</option>
                 </select>
-                <input type="text" name="varchar_length" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 hidden w-5/24" placeholder="Tamanho VARCHAR" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                <input type="text" name="varchar_length" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 hidden w-1/8" placeholder="Tamanho VARCHAR" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                <input type="text" name="numeric_precision" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 hidden w-1/8" placeholder="Precisão" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                <input type="text" name="numeric_scale" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 hidden w-1/8" placeholder="Escala" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
             </div>
             <div class="flex items-center mt-2">
                 <label class="mr-2 w-3/24">
                     <input type="checkbox" name="nullable"> Pode ser Nulo
                 </label>
-                <input type="text" name="column_descriptions" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 w-1/3" placeholder="Descrição da coluna">
+                <input type="text" name="column_descriptions" class="border border-gray-300 rounded-lg py-2 px-4 ml-2 w-1/16" placeholder="Descrição da coluna">
                 <button type="button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md ml-2" onclick="removeColumn(this)">Remover</button>
             </div>
         `;
         container.appendChild(columnDiv);
-    }
+    }    
 
     function removeColumn(button) {
         const columnDiv = button.parentElement.parentElement;
         const container = document.getElementById('columns-container');
-
+        const errorMessageDiv = document.getElementById('error-message');
+        
         if (container.children.length > 1) {
             container.removeChild(columnDiv);
+            errorMessageDiv.textContent = ''; // Limpa qualquer mensagem de erro
         } else {
-            alert("É necessário ter pelo menos uma coluna.");
+            errorMessageDiv.textContent = "É necessário ter pelo menos uma coluna."; // Exibe a mensagem de erro
         }
     }
+    
 
-    function toggleVarcharField(select) {
+    function toggleFieldVisibility(select) {
         const varcharInput = select.parentElement.querySelector('input[name="varchar_length"]');
-        if (select.value === 'VARCHAR') {
+        const precisionInput = select.parentElement.querySelector('input[name="numeric_precision"]');
+        const scaleInput = select.parentElement.querySelector('input[name="numeric_scale"]');
+        
+        // Reseta todos os campos adicionais
+        varcharInput.classList.add('hidden');
+        precisionInput.classList.add('hidden');
+        scaleInput.classList.add('hidden');
+        varcharInput.value = '';
+        precisionInput.value = '';
+        scaleInput.value = '';
+
+        // Mostrar o campo relevante conforme o tipo selecionado
+        if (select.value === 'VARCHAR' || select.value === 'CHAR' || select.value === 'BIT' || select.value === 'BIT VARYING') {
             varcharInput.classList.remove('hidden');
-        } else {
-            varcharInput.classList.add('hidden');
-            varcharInput.value = '';
+        } else if (select.value === 'NUMERIC' || select.value === 'DECIMAL') {
+            precisionInput.classList.remove('hidden');
+            scaleInput.classList.remove('hidden');
         }
     }
+    
 
     function buildColumnDefinitions() {
         const columns = document.getElementsByName('column_names');
@@ -107,18 +161,35 @@
         const nullable = document.getElementsByName('nullable');
         const descriptions = document.getElementsByName('column_descriptions');
         const varcharLengths = document.getElementsByName('varchar_length');
+        const precisions = document.getElementsByName('numeric_precision');
+        const scales = document.getElementsByName('numeric_scale');
         
         let columnDefinitions = [];
         let commentStatements = [];
         
         const tableName = document.getElementById('table_name').value; // Nome da tabela
         
+        let hasError = false;
+
         for (let i = 0; i < columns.length; i++) {
             let columnDefinition = `${columns[i].value} ${types[i].value}`;
             
-            // Adiciona o tamanho do VARCHAR se for especificado
-            if (types[i].value === 'VARCHAR' && varcharLengths[i].value) {
+            // Validação para campos VARCHAR, CHAR, BIT e BIT VARYING
+            if ((types[i].value === 'VARCHAR' || types[i].value === 'CHAR' || types[i].value === 'BIT' || types[i].value === 'BIT VARYING') && !varcharLengths[i].value) {
+                alert(`O campo "Tamanho VARCHAR" para a coluna "${columns[i].value}" não pode estar vazio.`);
+                hasError = true;
+            } else if ((types[i].value === 'VARCHAR' || types[i].value === 'CHAR' || types[i].value === 'BIT' || types[i].value === 'BIT VARYING') && varcharLengths[i].value) {
                 columnDefinition += `(${varcharLengths[i].value})`;
+            }
+            
+            // Validação para NUMERIC e DECIMAL
+            if ((types[i].value === 'NUMERIC' || types[i].value === 'DECIMAL')) {
+                if (!precisions[i].value || !scales[i].value) {
+                    alert(`Os campos "Precisão" e "Escala" para a coluna "${columns[i].value}" não podem estar vazios.`);
+                    hasError = true;
+                } else {
+                    columnDefinition += `(${precisions[i].value},${scales[i].value})`;
+                }
             }
             
             // Adiciona NOT NULL se não puder ser nulo
@@ -133,7 +204,11 @@
                 commentStatements.push(`COMMENT ON COLUMN ${tableName}.${columns[i].value} IS '${descriptions[i].value}';`);
             }
         }
-    
+        
+        if (hasError) {
+            return false; // Impede o envio do formulário
+        }
+        
         console.log('Definições de Colunas:', columnDefinitions.join(', '));
         console.log('Comandos de Comentário:', commentStatements.join(' '));
         
@@ -144,6 +219,7 @@
         
         return true; // Permite que o formulário seja enviado
     }
+    
     
 
 </script>
